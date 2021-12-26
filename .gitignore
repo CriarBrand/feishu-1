@@ -1,0 +1,9 @@
+.DS_Store
+.idea/
+book/
+*tmp.go
+TODO
+demo
+venv
+/departments_test.go
+/users_test.go
