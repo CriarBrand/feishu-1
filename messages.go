@@ -77,3 +77,46 @@ func (c *Client) SendMessages(param SendMessagesParam) (*SendMessagesRes, error)
 	}
 	return &data, err
 }
+
+//--------------------------------------------------------------------------------------------------------------------
+
+// BatchSendMessagesParam 批量发送消息的请求结构体
+type BatchSendMessagesParam struct {
+	DepartmentIds []string    `json:"department_ids"`
+	OpenIds       []string    `json:"open_ids"`
+	UserIds       []string    `json:"user_ids"`
+	MsgType       string      `json:"msg_type"`
+	Content       interface{} `json:"content"`
+	Card          interface{} `json:"card"`
+}
+
+// BatchSendMessagesRes 批量发送消息的响应结构体
+type BatchSendMessagesRes struct {
+	ResponseCode
+	Data struct {
+		InvalidDepartmentIds []string `json:"invalid_department_ids"`
+		InvalidOpenIds       []string `json:"invalid_open_ids"`
+		InvalidUserIds       []string `json:"invalid_user_ids"`
+		MessageId            string   `json:"message_id"`
+	} `json:"data"`
+}
+
+// BatchSendMessages 批量发送消息
+func (c *Client) BatchSendMessages(param BatchSendMessagesParam) (*BatchSendMessagesRes, error) {
+	jsonStr, _ := json.Marshal(param)
+	request, _ := http.NewRequest(http.MethodPost, ServerUrl+"/open-apis/message/v4/batch_send/", strings.NewReader(string(jsonStr)))
+	AccessToken, err := c.TokenManager.GetAccessToken()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.Do(request, AccessToken)
+	if err != nil {
+		return nil, err
+	}
+	var data BatchSendMessagesRes
+	err = json.Unmarshal(resp, &data)
+	if err != nil {
+		return nil, err
+	}
+	return &data, err
+}
