@@ -28,9 +28,8 @@ const (
 )
 
 var (
-	ServerUrl  = "https://open.feishu.cn"
-	ServerUrl2 = "https://www.feishu.cn"
-	UserAgent  = "fastwego/feishu"
+	ServerUrl = "https://open.feishu.cn"
+	UserAgent = "fastwego/feishu"
 )
 
 type ResponseCode struct {

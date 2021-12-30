@@ -117,6 +117,7 @@ func (c *Client) UsersFindByDepartment(param UsersFindByDepartmentParam) (*Users
 	}
 	request, _ := http.NewRequest(http.MethodGet, ServerUrl+"/open-apis/contact/v3/users/find_by_department?"+params.Encode(), nil)
 	AccessToken, err := c.TokenManager.GetAccessToken()
+	fmt.Println(AccessToken)
 	if err != nil {
 		return nil, err
 	}
