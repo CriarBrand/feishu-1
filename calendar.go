@@ -441,6 +441,59 @@ func (c *Client) UpdateCalendar(req UpdateCalendarReq) (*UpdateCalendarRes, erro
 	return &data, err
 }
 
+// --------------------------------------------------搜索日历------------------------------------------------------------
+
+type SearchCalendarReq struct {
+	PageSize  int64                 `json:"page_size"`  // 一次请求要求返回最大数量，最大值：50
+	PageToken string                `json:"page_token"` // 上次请求Response返回的分页标记，首次请求时为空
+	Body      SearchCalendarReqBody `json:"body"`       // 请求体
+}
+
+type SearchCalendarReqBody struct {
+	Query string `json:"query"` // 搜索关键字
+}
+
+type SearchCalendarRes struct {
+	ResponseCode
+	Data SearchCalendarResData `json:"data"`
+}
+
+type SearchCalendarResData struct {
+	Items     []SearchCalendarResDataItems `json:"items"`
+	PageToken string                       `json:"page_token"`
+}
+
+type SearchCalendarResDataItems CreateCalendarResCalendar
+
+// SearchCalendar 搜索日历
+func (c *Client) SearchCalendar(req SearchCalendarReq) (*SearchCalendarRes, error) {
+	bodyByte, err := json.Marshal(req.Body)
+	params := url.Values{}
+	if req.PageToken != "" {
+		params.Add("page_token", req.PageToken)
+	}
+	if req.PageSize > 0 {
+		params.Add("page_size", fmt.Sprintf("%v", req.PageSize))
+	}
+	request, _ := http.NewRequest(http.MethodPost, ServerUrl+"/open-apis/calendar/v4/calendars/search?"+params.Encode(),
+		strings.NewReader(string(bodyByte)))
+
+	AccessToken, err := c.TokenManager.GetAccessToken()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.Do(request, AccessToken)
+	if err != nil {
+		return nil, err
+	}
+	var data SearchCalendarRes
+	err = json.Unmarshal(resp, &data)
+	if err != nil {
+		return nil, err
+	}
+	return &data, err
+}
+
 // --------------------------------------------------创建日程------------------------------------------------------------
 
 // CreateCalendarEventsReq 创建日程-请求体对外结构
